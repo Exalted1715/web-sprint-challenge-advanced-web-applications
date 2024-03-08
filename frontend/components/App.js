@@ -65,7 +65,6 @@ export default function App() {
       const authToken = localStorage.getItem('token');
       const response = await axios.get(articlesUrl, {
         headers: {
-          
           Authorization: `${authToken}`
         }
       });
@@ -126,15 +125,74 @@ export default function App() {
       setSpinnerOn(false);
     }
   };
-  
 
-  const updateArticle = ({ article_id, article }) => {
-    // ✨ implement
-    // You got this!
+  const updateArticle = async ({ article_id, article }) => {
+    setMessage('');
+    setSpinnerOn(true);
+
+    try {
+      const authToken = localStorage.getItem('token');
+      const response = await axios.put(
+        `${articlesUrl}/${article_id}`,
+        {
+          title: article.title.trim(),
+          text: article.text.trim(),
+          topic: article.topic
+        },
+        {
+          headers: {
+            Authorization: `${authToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setMessage(response.data.message);
+        getArticles(); // Refresh articles after updating
+      } else {
+        setMessage('Failed to update article');
+      }
+    } catch (error) {
+      console.error('Error updating article:', error);
+      if (error.response && error.response.status === 401) {
+        redirectToLogin();
+      } else {
+        setMessage('Failed to update article');
+      }
+    } finally {
+      setSpinnerOn(false);
+    }
   };
 
-  const deleteArticle = article_id => {
-    // ✨ implement
+  const deleteArticle = async (article_id) => {
+    setMessage('');
+    setSpinnerOn(true);
+
+    try {
+      const authToken = localStorage.getItem('token');
+      const response = await axios.delete(`${articlesUrl}/${article_id}`, {
+        headers: {
+          Authorization: `${authToken}`
+        }
+      });
+
+      if (response.status === 200) {
+        setMessage(response.data.message);
+        getArticles(); // Refresh articles after deleting
+      } else {
+        setMessage('Failed to delete article');
+      }
+    } catch (error) {
+      console.error('Error deleting article:', error);
+      if (error.response && error.response.status === 401) {
+        redirectToLogin();
+      } else {
+        setMessage('Failed to delete article');
+      }
+    } finally {
+      setSpinnerOn(false);
+    }
   };
 
   return (
@@ -149,22 +207,23 @@ export default function App() {
           <NavLink id="articlesScreen" to="/articles">Articles</NavLink>
         </nav>
         <Routes>
-          <Route path="/" element={<LoginForm login={login} />} />
-          <Route path="articles" element={
-            <>
-              <ArticleForm 
-              postArticle={postArticle}
-              />
-              <Articles
-                articles={articles}
-                getArticles={getArticles}
-                deleteArticle={deleteArticle}
-                postArticle={postArticle}
-                setCurrentArticleId={setCurrentArticleId}
-                currentArticleId={currentArticleId}
-              />
-            </>
-          } />
+        <Route path="articles" element={
+  <>
+    <ArticleForm 
+      postArticle={postArticle}
+      updateArticle={updateArticle}
+      setCurrentArticleId={setCurrentArticleId}
+      currentArticle={articles.find(article => article.article_id === currentArticleId)} // Find the current article object based on its ID
+    />
+    <Articles
+      articles={articles}
+      getArticles={getArticles}
+      deleteArticle={deleteArticle}
+      setCurrentArticleId={setCurrentArticleId}
+      currentArticleId={currentArticleId}
+    />
+  </>
+} />
         </Routes>
         <footer>Bloom Institute of Technology 2022</footer>
       </div>

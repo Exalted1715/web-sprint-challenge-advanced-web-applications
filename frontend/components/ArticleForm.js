@@ -37,10 +37,11 @@ export default function ArticleForm({
     } else {
       postArticle(trimmedValues); // Passing trimmedValues to postArticle function
     }
+    setValues(initialFormValues);
   };
 
   const isDisabled = () => {
-    return !values.title.trim() || !values.text.trim() || !values.topic.trim();
+    return !values.title || !values.text || !values.topic
   };
 
   return (
