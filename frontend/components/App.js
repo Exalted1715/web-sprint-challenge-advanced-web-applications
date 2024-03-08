@@ -5,6 +5,7 @@ import LoginForm from './LoginForm'
 import Message from './Message'
 import ArticleForm from './ArticleForm'
 import Spinner from './Spinner'
+import axios from 'axios'
 
 const articlesUrl = 'http://localhost:9000/api/articles'
 const loginUrl = 'http://localhost:9000/api/login'
@@ -17,26 +18,47 @@ export default function App() {
   const [spinnerOn, setSpinnerOn] = useState(false)
 
   // ✨ Research `useNavigate` in React Router v.6
-  const navigate = useNavigate()
-  const redirectToLogin = () => { /* ✨ implement */ }
-  const redirectToArticles = () => { /* ✨ implement */ }
+  const navigate = useNavigate();
+
+  const redirectToLogin = () => {
+    navigate('/');
+  };
+
+  const redirectToArticles = () => {
+    navigate('/articles');
+  };
 
   const logout = () => {
-    // ✨ implement
-    // If a token is in local storage it should be removed,
-    // and a message saying "Goodbye!" should be set in its proper state.
-    // In any case, we should redirect the browser back to the login screen,
-    // using the helper above.
-  }
+    localStorage.removeItem('token');
+    setMessage('Goodbye!');
+    redirectToLogin();
+  };
 
-  const login = ({ username, password }) => {
-    // ✨ implement
-    // We should flush the message state, turn on the spinner
-    // and launch a request to the proper endpoint.
-    // On success, we should set the token to local storage in a 'token' key,
-    // put the server success message in its proper state, and redirect
-    // to the Articles screen. Don't forget to turn off the spinner!
-  }
+  const login = async ({ username, password }) => {
+    setMessage('');
+    setSpinnerOn(true);
+
+    try {
+      const response = await axios.post(loginUrl, {
+        username: username,
+        password: password
+      });
+
+      if (response.status === 200) {
+        const authToken = response.data.token;
+        localStorage.setItem('token', authToken);
+        setMessage(response.data.message);
+        redirectToArticles();
+      } else {
+        setMessage('Login failed');
+      }
+    } catch (error) {
+      console.error('Error logging in:', error);
+      setMessage('Login failed');
+    } finally {
+      setSpinnerOn(false);
+    }
+  };
 
   const getArticles = () => {
     // ✨ implement
@@ -65,20 +87,20 @@ export default function App() {
     // ✨ implement
   }
 
+  
   return (
-    // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
     <>
-      <Spinner />
-      <Message />
+      <Spinner show={spinnerOn} />
+      <Message message={message} />
       <button id="logout" onClick={logout}>Logout from app</button>
-      <div id="wrapper" style={{ opacity: spinnerOn ? "0.25" : "1" }}> {/* <-- do not change this line */}
+      <div id="wrapper" style={{ opacity: spinnerOn ? "0.25" : "1" }}>
         <h1>Advanced Web Applications</h1>
         <nav>
           <NavLink id="loginScreen" to="/">Login</NavLink>
           <NavLink id="articlesScreen" to="/articles">Articles</NavLink>
         </nav>
         <Routes>
-          <Route path="/" element={<LoginForm />} />
+          <Route path="/" element={<LoginForm login={login} />} />
           <Route path="articles" element={
             <>
               <ArticleForm />
@@ -89,5 +111,5 @@ export default function App() {
         <footer>Bloom Institute of Technology 2022</footer>
       </div>
     </>
-  )
+  );
 }
