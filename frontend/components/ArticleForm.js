@@ -26,10 +26,16 @@ export default function ArticleForm({
 
   const onSubmit = evt => {
     evt.preventDefault();
+    const trimmedValues = {
+      title: values.title.trim(),
+      text: values.text.trim(),
+      topic: values.topic
+    };
+
     if (currentArticle) {
-      updateArticle({ article_id: currentArticle.article_id, article: values });
+      updateArticle({ article_id: currentArticle.article_id, article: trimmedValues });
     } else {
-      postArticle(values);
+      postArticle(trimmedValues); // Passing trimmedValues to postArticle function
     }
   };
 

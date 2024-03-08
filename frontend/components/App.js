@@ -88,12 +88,45 @@ export default function App() {
     }
   };
 
-  const postArticle = article => {
-    // ✨ implement
-    // The flow is very similar to the `getArticles` function.
-    // You'll know what to do! Use log statements or breakpoints
-    // to inspect the response from the server.
+  const postArticle = async (article) => {
+    setMessage('');
+    setSpinnerOn(true);
+  
+    try {
+      const authToken = localStorage.getItem('token');
+      const response = await axios.post(
+        articlesUrl,
+        {
+          title: article.title.trim(),
+          text: article.text.trim(),
+          topic: article.topic
+        },
+        {
+          headers: {
+            Authorization: `${authToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+  
+      if (response.status === 201) {
+        setMessage(response.data.message);
+        getArticles(); // Refresh articles after posting
+      } else {
+        setMessage('Failed to post article');
+      }
+    } catch (error) {
+      console.error('Error posting article:', error);
+      if (error.response && error.response.status === 401) {
+        redirectToLogin();
+      } else {
+        setMessage('Failed to post article');
+      }
+    } finally {
+      setSpinnerOn(false);
+    }
   };
+  
 
   const updateArticle = ({ article_id, article }) => {
     // ✨ implement
@@ -119,11 +152,14 @@ export default function App() {
           <Route path="/" element={<LoginForm login={login} />} />
           <Route path="articles" element={
             <>
-              <ArticleForm />
+              <ArticleForm 
+              postArticle={postArticle}
+              />
               <Articles
                 articles={articles}
                 getArticles={getArticles}
                 deleteArticle={deleteArticle}
+                postArticle={postArticle}
                 setCurrentArticleId={setCurrentArticleId}
                 currentArticleId={currentArticleId}
               />
