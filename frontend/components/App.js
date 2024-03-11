@@ -88,7 +88,7 @@ export default function App() {
   };
 
   const postArticle = async (article) => {
-    setMessage('');
+   
     setSpinnerOn(true);
   
     try {
@@ -110,7 +110,10 @@ export default function App() {
   
       if (response.status === 201) {
         setMessage(response.data.message);
-        getArticles(); // Refresh articles after posting
+        console.log(response.data.message)
+        console.log(message)
+      
+        
       } else {
         setMessage('Failed to post article');
       }
@@ -149,7 +152,7 @@ export default function App() {
 
       if (response.status === 200) {
         setMessage(response.data.message);
-        getArticles(); // Refresh articles after updating
+        
       } else {
         setMessage('Failed to update article');
       }
@@ -179,7 +182,7 @@ export default function App() {
 
       if (response.status === 200) {
         setMessage(response.data.message);
-        getArticles(); // Refresh articles after deleting
+        
       } else {
         setMessage('Failed to delete article');
       }
