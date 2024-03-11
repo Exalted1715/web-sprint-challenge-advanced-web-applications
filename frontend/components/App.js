@@ -207,24 +207,25 @@ export default function App() {
           <NavLink id="articlesScreen" to="/articles">Articles</NavLink>
         </nav>
         <Routes>
-        <Route path="articles" element={
-  <>
-    <ArticleForm 
-      postArticle={postArticle}
-      updateArticle={updateArticle}
-      setCurrentArticleId={setCurrentArticleId}
-      currentArticle={articles.find(article => article.article_id === currentArticleId)} // Find the current article object based on its ID
-    />
-    <Articles
-      articles={articles}
-      getArticles={getArticles}
-      deleteArticle={deleteArticle}
-      setCurrentArticleId={setCurrentArticleId}
-      currentArticleId={currentArticleId}
-    />
-  </>
-} />
-        </Routes>
+  <Route path="/" element={<LoginForm login={login} />} />
+  <Route path="/articles" element={
+    <>
+      <ArticleForm 
+        postArticle={postArticle}
+        updateArticle={updateArticle}
+        setCurrentArticleId={setCurrentArticleId}
+        currentArticle={articles.find(article => article.article_id === currentArticleId)} // Find the current article object based on its ID
+      />
+      <Articles
+        articles={articles}
+        getArticles={getArticles}
+        deleteArticle={deleteArticle}
+        setCurrentArticleId={setCurrentArticleId}
+        currentArticleId={currentArticleId}
+      />
+    </>
+  } />
+</Routes>
         <footer>Bloom Institute of Technology 2022</footer>
       </div>
     </>
