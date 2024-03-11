@@ -13,6 +13,8 @@ const StyledMessage = styled.div`
 
 export default function Message({ message }) {
   useEffect(() => {
+
+    
     console.log('Message updated:', message);
   }, [message]);
 

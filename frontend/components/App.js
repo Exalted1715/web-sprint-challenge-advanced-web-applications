@@ -31,6 +31,8 @@ export default function App() {
     redirectToLogin();
   };
 
+  
+
   const login = async ({ username, password }) => {
     setMessage('');
     setSpinnerOn(true);
@@ -88,7 +90,6 @@ export default function App() {
   };
 
   const postArticle = async (article) => {
-    
     setSpinnerOn(true);
   
     try {
@@ -109,11 +110,9 @@ export default function App() {
       );
   
       if (response.status === 201) {
+        // Update articles without fetching again
+        setArticles(prevArticles => [...prevArticles, response.data.article]);
         setMessage(response.data.message);
-        console.log(response.data.message)
-        console.log(message)
-      
-        getArticles(); // Refresh articles after posting
       } else {
         setMessage('Failed to post article');
       }
@@ -128,6 +127,7 @@ export default function App() {
       setSpinnerOn(false);
     }
   };
+  
 
   const updateArticle = async ({ article_id, article }) => {
     setSpinnerOn(true);
@@ -150,8 +150,13 @@ export default function App() {
       );
   
       if (response.status === 200) {
+        // Update articles without fetching again
+        setArticles(prevArticles =>
+          prevArticles.map(prevArticle =>
+            prevArticle.article_id === article_id ? { ...prevArticle, ...article } : prevArticle
+          )
+        );
         setMessage(response.data.message);
-        getArticles(); // Refresh articles after updating
         setCurrentArticleId(null); // Reset currentArticleId
       } else {
         setMessage('Failed to update article');
@@ -168,11 +173,11 @@ export default function App() {
     }
   };
   
+  
 
   const deleteArticle = async (article_id) => {
-    
     setSpinnerOn(true);
-
+  
     try {
       const authToken = localStorage.getItem('token');
       const response = await axios.delete(`${articlesUrl}/${article_id}`, {
@@ -180,10 +185,11 @@ export default function App() {
           Authorization: `${authToken}`
         }
       });
-
+  
       if (response.status === 200) {
+        // Filter out the deleted article from the articles state
+        setArticles(prevArticles => prevArticles.filter(article => article.article_id !== article_id));
         setMessage(response.data.message);
-        getArticles(); // Refresh articles after deleting
       } else {
         setMessage('Failed to delete article');
       }
@@ -198,6 +204,9 @@ export default function App() {
       setSpinnerOn(false);
     }
   };
+  
+
+  
 
   return (
     <>
