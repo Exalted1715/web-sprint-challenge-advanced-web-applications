@@ -71,7 +71,7 @@ export default function App() {
   
       if (response.status === 200) {
         setArticles(response.data.articles);
-        setMessage(response.data.message);
+        
       } else {
         setMessage('Failed to fetch articles');
       }
