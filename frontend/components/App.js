@@ -130,9 +130,8 @@ export default function App() {
   };
 
   const updateArticle = async ({ article_id, article }) => {
-    
     setSpinnerOn(true);
-
+  
     try {
       const authToken = localStorage.getItem('token');
       const response = await axios.put(
@@ -149,10 +148,11 @@ export default function App() {
           }
         }
       );
-
+  
       if (response.status === 200) {
         setMessage(response.data.message);
         getArticles(); // Refresh articles after updating
+        setCurrentArticleId(null); // Reset currentArticleId
       } else {
         setMessage('Failed to update article');
       }
@@ -167,6 +167,7 @@ export default function App() {
       setSpinnerOn(false);
     }
   };
+  
 
   const deleteArticle = async (article_id) => {
     
